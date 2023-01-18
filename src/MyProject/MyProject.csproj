@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <UsingTask TaskName="mkrystianc.mytasks.MyTask1" AssemblyFile="..\MyTask1\bin\Debug\net6.0\MyTask1.dll"/>
+    <ItemGroup>
+        <MySourceItems Include="file1.resx;file2.resx" />
+    </ItemGroup>
+    <Target Name="MyTarget">
+        <MyTask1 MyInputProperty="Hello!" >
+            <Output TaskParameter="MyOutputProperty" PropertyName="FinalOutputProperty" /> 
+            <Output TaskParameter="MyOutputItem" ItemName="FinalOutputItem" /> 
+        </MyTask1>
+        <Message Text="Hello $(FinalOutputProperty)" Importance="high" />
+        <Message Text="Hello %(FinalOutputItem.MyKey1_1)" Importance="high" />
+    </Target>
+    
+    <Target Name="MyTarget3">
+        <CreateItem
+                Include="@(MySourceItems)"
+                AdditionalMetadata="extension=extra">
+            <Output
+                    TaskParameter="Include"
+                    ItemName="MySourceItemsWithMetadata"/>
+        </CreateItem>
+        <Message Text="Hello $(FinalOutputProperty)" Importance="high" />
+        <Message Text="Items @(MySourceItemsWithMetadata)%(MyMetadata)" Importance="high" />
+        <Message Text="Items %(MySourceItemsWithMetadata.MyMetadata)" Importance="high" />
+        <Message Text="Items %(MySourceItemsWithMetadata.extension)" Importance="high" />
+    </Target>
+    
+    <Target Name="MyTarget2">
+        <ItemGroup>
+            <Item1 Include="hourglass.a;foo.b;bar.c" KeepDuplicates="false" />
+            <Item2 Include="hourglass" />
+        </ItemGroup>
+
+        <Message Text="Item1: @(Item1) Count: @(Item1->Count())" Importance="high" />
+        <Message Text="  %(Item1.Identity)%(Item1.Extension)  Count: @(Item1->Count())" Importance="high" />
+        <Message Text="Item2: @(Item2)" Importance="high" />
+        <Message Text="  %(Item2.Identity)  Count: @(Item2->Count())" Importance="high" />
+    </Target>
+
+    <Target Name="MyTarget3">
+        <ItemGroup>
+            <Item1 Include="hourglass.a;foo.b;bar.c" >
+                <Extension>Heloo Kitty</Extension>
+                <MyMetadata2>Hello Kitty</MyMetadata2>
+            </Item1>
+        </ItemGroup>
+
+        <Message Text="Item1: @(Item1) Count: @(Item1->Count())" Importance="high" />
+        <Message Text="  %(Item1.Identity)%(Item1.MyMetadata1)%(Item1.MyMetadata2)   Count: @(Item1->Count())" Importance="high" />
+    </Target>
+</Project>
